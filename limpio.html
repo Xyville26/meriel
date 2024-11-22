@@ -1,0 +1,762 @@
+<html><head><base href="." /><title>Christmas Snake Game - Classic & Campaign</title><style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #0f3a1a; /* Dark Christmas green */
+    font-family: Arial, sans-serif;
+}
+
+#gameContainer {
+    text-align: center;
+}
+
+#gameCanvas {
+    border: 2px solid #c41e3a; /* Christmas red */
+    background-color: #0f3a1a; /* Dark Christmas green */
+}
+
+#score, #level {
+    color: #c41e3a; /* Christmas red */
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+.button {
+    background-color: #c41e3a; /* Christmas red */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #a01830; /* Darker Christmas red */
+}
+
+#modeSelection {
+    margin-bottom: 20px;
+}
+
+#level {
+    color: #c41e3a; /* Christmas red */
+    font-size: 24px; /* Make it the same size as score */
+    margin: 10px 0;
+    font-weight: bold;
+    display: none;
+}
+
+.obstacle {
+    background-color: #964B00;
+}
+
+#settingsModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #0f3a1a; /* Dark Christmas green */
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #c41e3a;
+    z-index: 1000;
+}
+
+#settingsModal h2 {
+    color: #c41e3a;
+    margin-top: 0;
+}
+
+.setting-item {
+    margin: 15px 0;
+    color: #fff;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.setting-item select, .setting-item input {
+    width: 100%;
+    padding: 5px;
+    background-color: #0f3a1a; /* Dark Christmas green */
+    color: #fff;
+    border: 1px solid #c41e3a;
+    border-radius: 4px;
+}
+
+#settingsButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#pauseButton {
+    background-color: #c41e3a; /* Christmas red */
+    margin-top: 20px;
+}
+
+/* Add new styles for the start screen */
+#startScreen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #c41e3a;
+    background-color: rgba(15, 58, 26, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #c41e3a;
+    z-index: 1000;
+}
+
+#startScreen h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #c41e3a;
+}
+
+#startScreen p {
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Add snowflake animation */
+@keyframes snowfall {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.snowflake {
+    position: fixed;
+    color: #fff;
+    font-size: 20px;
+    animation: snowfall 5s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Intro Screen Styles */
+#introScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0f3a1a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    color: #c41e3a;
+    animation: fadeIn 1s ease-in;
+}
+
+#introScreen h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    animation: scaleIn 1.5s ease-out;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#introScreen p {
+    font-size: 24px;
+    color: white;
+    text-align: center;
+    margin: 10px 0;
+    animation: slideIn 1.5s ease-out;
+}
+
+#introScreen .enter-button {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 20px;
+    background-color: #c41e3a;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.christmas-decoration {
+    position: absolute;
+    font-size: 24px;
+    animation: rotate 3s infinite linear;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Add new styles for the digital name */
+.digital-name {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    color: #0f0;
+    text-shadow: 0 0 5px #0f0;
+    font-size: 14px;
+    letter-spacing: 2px;
+    z-index: 2001;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    animation: digitalGlow 2s infinite;
+}
+
+@keyframes digitalGlow {
+    0% {
+        text-shadow: 0 0 5px #0f0;
+    }
+    50% {
+        text-shadow: 0 0 15px #0f0, 0 0 25px #0f0;
+    }
+    100% {
+        text-shadow: 0 0 5px #0f0;
+    }
+}
+
+.digital-effect {
+    position: absolute;
+    font-family: 'Arial', sans-serif;
+    color: rgba(0, 255, 0, 0.2);
+    font-size: 20px;
+    pointer-events: none;
+    user-select: none;
+    animation: treeGlow 2s infinite alternate;
+}
+
+@keyframes treeGlow {
+    from { color: rgba(0, 255, 0, 0.1); }
+    to { color: rgba(0, 255, 0, 0.3); }
+}
+</style></head><body>
+<div id="introScreen">
+    <span class="christmas-decoration" style="top: 20px; left: 20%;">🎄</span>
+    <span class="christmas-decoration" style="top: 30px; right: 20%;">🎅</span>
+    <span class="christmas-decoration" style="bottom: 20px; left: 30%;">🎁</span>
+    <span class="christmas-decoration" style="bottom: 40px; right: 30%;">⛄</span>
+    <h1>Welcome to Christmas Snake!</h1>
+    <p>Get ready for a festive adventure!</p>
+    <p>Collect Christmas ornaments and grow your snake</p>
+    <p>Choose between Classic mode or take on the Campaign challenge</p>
+    <button class="enter-button">Enter Game</button>
+    <div class="digital-name">
+        Created by: Meriel Limpio Cabaltera
+    </div>
+</div>
+<div id="startScreen">
+    <h1>Christmas Snake Game</h1>
+    <p>Choose your game mode to begin!</p>
+    <p>Use arrow keys to control the snake<br>Press ESC to pause</p>
+    <button class="button" id="classicMode">Classic Mode</button>
+    <button class="button" id="campaignMode">Campaign Mode</button>
+</div>
+<div id="gameContainer">
+    <button class="button" id="settingsButton">⚙️ Settings</button>
+    <div id="modeSelection" style="display: none;">
+        <button class="button" id="classicMode">Classic Mode</button>
+        <button class="button" id="campaignMode">Campaign Mode</button>
+    </div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="level">Level: 1</div>
+    <button class="button" id="startButton" style="display: none;">Start Game</button>
+    <button class="button" id="pauseButton" style="display: none;">Pause</button>
+</div>
+
+<div id="settingsModal">
+    <h2>Settings</h2>
+    <div class="setting-item">
+        <label for="difficultySelect">Difficulty:</label>
+        <select id="difficultySelect">
+            <option value="easy">Easy (Slower)</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard (Faster)</option>
+        </select>
+    </div>
+    <div class="setting-item">
+        <label for="snakeColorSelect">Snake Color:</label>
+        <select id="snakeColorSelect">
+            <option value="#c41e3a" selected>Christmas Red</option>
+            <option value="#0f3a1a">Christmas Green</option>
+            <option value="#ffffff">Snow White</option>
+            <option value="#ffd700">Gold</option>
+        </select>
+    </div>
+    <div class="setting-item">
+        <label for="soundToggle">Sound Effects:</label>
+        <input type="checkbox" id="soundToggle" checked>
+    </div>
+    <button class="button" onclick="closeSettings()">Close</button>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const startButton = document.getElementById('startButton');
+const pauseButton = document.getElementById('pauseButton');
+const scoreElement = document.getElementById('score');
+const levelElement = document.getElementById('level');
+const classicModeBtn = document.getElementById('classicMode');
+const campaignModeBtn = document.getElementById('campaignMode');
+const settingsButton = document.getElementById('settingsButton');
+const settingsModal = document.getElementById('settingsModal');
+const difficultySelect = document.getElementById('difficultySelect');
+const snakeColorSelect = document.getElementById('snakeColorSelect');
+const soundToggle = document.getElementById('soundToggle');
+const startScreen = document.getElementById('startScreen');
+const introScreen = document.getElementById('introScreen');
+const enterButton = document.querySelector('.enter-button');
+
+let isPaused = false; // Add isPaused state variable
+
+const gridSize = 20;
+const tileCount = canvas.width / gridSize;
+let snake = [];
+let food = {};
+let direction = 'right';
+let score = 0;
+let gameLoop = null;
+let gameSpeed = 100;
+let currentMode = '';
+let currentLevel = 1;
+let obstacles = [];
+let snakeColor = '#c41e3a'; // Default to Christmas Red
+let soundEnabled = true;
+
+function openSettings() {
+    settingsModal.style.display = 'block';
+}
+
+function closeSettings() {
+    settingsModal.style.display = 'none';
+}
+
+function updateSettings() {
+    switch(difficultySelect.value) {
+        case 'easy':
+            gameSpeed = 150;
+            break;
+        case 'normal':
+            gameSpeed = 100;
+            break;
+        case 'hard':
+            gameSpeed = 70;
+            break;
+    }
+    
+    snakeColor = snakeColorSelect.value;
+    
+    soundEnabled = soundToggle.checked;
+    
+    if (gameLoop) {
+        clearInterval(gameLoop);
+        gameLoop = setInterval(gameStep, gameSpeed);
+    }
+}
+
+function initGame() {
+    snake = [
+        {x: 5, y: 5},
+        {x: 4, y: 5},
+        {x: 3, y: 5}
+    ];
+    direction = 'right';
+    score = 0;
+    isPaused = false;
+    pauseButton.textContent = 'Pause';
+    scoreElement.textContent = `Score: ${score}`;
+    obstacles = [];
+    
+    if (currentMode === 'campaign') {
+        currentLevel = 1;
+        levelElement.textContent = `Level: ${currentLevel}`;
+        levelElement.style.display = 'block';
+        generateObstacles();
+        gameSpeed = Math.max(50, 100 - (currentLevel * 5));
+    } else {
+        currentLevel = 1;
+        levelElement.style.display = 'block';
+        levelElement.textContent = `Level: ${currentLevel}`;
+        gameSpeed = 100;
+    }
+    spawnFood();
+}
+
+function generateObstacles() {
+    obstacles = [];
+    const numObstacles = currentLevel * 2;
+    for (let i = 0; i < numObstacles; i++) {
+        let obstacle = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount)
+        };
+        while (isColliding(obstacle) || (obstacle.x === food.x && obstacle.y === food.y)) {
+            obstacle = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+        }
+        obstacles.push(obstacle);
+    }
+}
+
+function isColliding(position) {
+    // Check snake self-collision
+    for (let segment of snake) {
+        if (position.x === segment.x && position.y === segment.y) {
+            return true;
+        }
+    }
+    
+    // Check obstacle collision for campaign mode
+    if (currentMode === 'campaign') {
+        for (let obstacle of obstacles) {
+            if (position.x === obstacle.x && position.y === obstacle.y) {
+                return true;
+            }
+        }
+    }
+    
+    // Check wall collision
+    if (position.x < 0 || position.x >= tileCount || position.y < 0 || position.y >= tileCount) {
+        return true;
+    }
+    
+    return false;
+}
+
+function spawnFood() {
+    food = {
+        x: Math.floor(Math.random() * tileCount),
+        y: Math.floor(Math.random() * tileCount)
+    };
+    while (isColliding(food) || obstacles.some(obs => obs.x === food.x && obs.y === food.y)) {
+        food = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount)
+        };
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#0f3a1a'; /* Dark Christmas green */
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (currentMode === 'campaign') {
+        ctx.fillStyle = '#964B00';
+        obstacles.forEach(obstacle => {
+            ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize - 2, gridSize - 2);
+        });
+    }
+
+    ctx.fillStyle = snakeColor;
+    snake.forEach((segment, index) => {
+        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+        
+        if (index === 0) {
+            ctx.fillStyle = '#000';
+            const eyeSize = 4;
+            switch(direction) {
+                case 'right':
+                    ctx.fillRect((segment.x * gridSize) + 12, (segment.y * gridSize) + 4, eyeSize, eyeSize);
+                    ctx.fillRect((segment.x * gridSize) + 12, (segment.y * gridSize) + 12, eyeSize, eyeSize);
+                    break;
+                case 'left':
+                    ctx.fillRect((segment.x * gridSize) + 4, (segment.y * gridSize) + 4, eyeSize, eyeSize);
+                    ctx.fillRect((segment.x * gridSize) + 4, (segment.y * gridSize) + 12, eyeSize, eyeSize);
+                    break;
+                case 'up':
+                    ctx.fillRect((segment.x * gridSize) + 4, (segment.y * gridSize) + 4, eyeSize, eyeSize);
+                    ctx.fillRect((segment.x * gridSize) + 12, (segment.y * gridSize) + 4, eyeSize, eyeSize);
+                    break;
+                case 'down':
+                    ctx.fillRect((segment.x * gridSize) + 4, (segment.y * gridSize) + 12, eyeSize, eyeSize);
+                    ctx.fillRect((segment.x * gridSize) + 12, (segment.y * gridSize) + 12, eyeSize, eyeSize);
+                    break;
+            }
+            ctx.fillStyle = snakeColor;
+        }
+    });
+
+    // Update the food drawing to look like a Christmas ornament
+    ctx.fillStyle = '#c41e3a'; // Christmas red for food
+    ctx.beginPath();
+    ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Add ornament top
+    ctx.fillStyle = '#ffd700'; // Gold for ornament top
+    ctx.fillRect(food.x * gridSize + gridSize/2 - 2, food.y * gridSize, 4, 4);
+}
+
+function update() {
+    if (isPaused) return;
+
+    const head = {x: snake[0].x, y: snake[0].y};
+    
+    switch(direction) {
+        case 'right': head.x++; break;
+        case 'left': head.x--; break;
+        case 'up': head.y--; break;
+        case 'down': head.y++; break;
+    }
+
+    if (isColliding(head)) {
+        gameOver();
+        return;
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        scoreElement.textContent = `Score: ${score}`;
+        
+        // Level up conditions
+        if (currentMode === 'campaign' && score % 50 === 0) {
+            currentLevel++;
+            levelElement.textContent = `Level: ${currentLevel}`;
+            generateObstacles();
+            gameSpeed = Math.max(50, 100 - (currentLevel * 5));
+            clearInterval(gameLoop);
+            gameLoop = setInterval(gameStep, gameSpeed);
+        } else if (currentMode === 'classic' && score % 30 === 0) {
+            // Level up in classic mode every 30 points
+            currentLevel++;
+            levelElement.textContent = `Level: ${currentLevel}`;
+            gameSpeed = Math.max(50, 100 - (currentLevel * 3));
+            clearInterval(gameLoop);
+            gameLoop = setInterval(gameStep, gameSpeed);
+        }
+        
+        spawnFood();
+    } else {
+        snake.pop();
+    }
+}
+
+function gameStep() {
+    update();
+    draw();
+}
+
+function gameOver() {
+    clearInterval(gameLoop);
+    gameLoop = null;
+    
+    // Show game over screen
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#c41e3a';
+    ctx.font = '48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over!', canvas.width/2, canvas.height/2);
+    ctx.font = '24px Arial';
+    ctx.fillText(`Final Score: ${score}`, canvas.width/2, canvas.height/2 + 40);
+    
+    // Reset and show start screen after delay
+    setTimeout(() => {
+        startScreen.style.display = 'block';
+        modeSelection.style.display = 'block';
+        pauseButton.style.display = 'none';
+        direction = 'right';
+    }, 2000);
+}
+
+document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+        case 'ArrowUp':
+            if (direction !== 'down') direction = 'up';
+            break;
+        case 'ArrowDown':
+            if (direction !== 'up') direction = 'down';
+            break;
+        case 'ArrowLeft':
+            if (direction !== 'right') direction = 'left';
+            break;
+        case 'ArrowRight':
+            if (direction !== 'left') direction = 'right';
+            break;
+        case 'Escape':
+            togglePause(); // Pause the game when Escape is pressed
+            break;
+    }
+});
+
+function togglePause() {
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+    
+    if (!isPaused) {
+        // Prevent multiple intervals
+        if (!gameLoop) {
+            gameLoop = setInterval(gameStep, gameSpeed);
+        }
+    }
+}
+
+function startGame(mode) {
+    currentMode = mode;
+    startScreen.style.display = 'none';
+    modeSelection.style.display = 'none';
+    pauseButton.style.display = 'block';
+    
+    initGame();
+    updateSettings();
+    
+    if (gameLoop) clearInterval(gameLoop);
+    gameLoop = setInterval(gameStep, gameSpeed);
+}
+
+classicModeBtn.addEventListener('click', () => startGame('classic'));
+campaignModeBtn.addEventListener('click', () => startGame('campaign'));
+
+startButton.addEventListener('click', () => {
+    initGame();
+    startButton.style.display = 'none';
+    pauseButton.style.display = 'block';
+    updateSettings(); // Apply current settings
+    if (gameLoop) clearInterval(gameLoop);
+    gameLoop = setInterval(gameStep, gameSpeed);
+});
+
+// Add touch controls for mobile devices
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    e.preventDefault();
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    if (!touchStartX || !touchStartY) return;
+
+    let touchEndX = e.touches[0].clientX;
+    let touchEndY = e.touches[0].clientY;
+
+    let dx = touchEndX - touchStartX;
+    let dy = touchEndY - touchStartY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal swipe
+        if (dx > 0 && direction !== 'left') direction = 'right';
+        else if (dx < 0 && direction !== 'right') direction = 'left';
+    } else {
+        // Vertical swipe
+        if (dy > 0 && direction !== 'up') direction = 'down';
+        else if (dy < 0 && direction !== 'down') direction = 'up';
+    }
+
+    touchStartX = touchEndX;
+    touchStartY = touchEndY;
+    e.preventDefault();
+});
+
+// Add function to create snowflakes
+function createSnowflakes() {
+    const snowflakes = ['❄', '❅', '❆'];
+    setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        snowflake.innerText = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+        document.body.appendChild(snowflake);
+        
+        // Remove snowflake after animation
+        setTimeout(() => {
+            snowflake.remove();
+        }, 6000);
+    }, 200);
+}
+
+// Add function to create digital effect
+function createDigitalEffect() {
+    const christmasTree = '🎄';  // Christmas tree emoji
+    const numTrees = 50; // Reduce number of trees for better visibility
+    
+    for (let i = 0; i < numTrees; i++) {
+        const tree = document.createElement('span');
+        tree.className = 'digital-effect';
+        tree.style.left = Math.random() * 100 + 'vw';
+        tree.style.top = Math.random() * 100 + 'vh';
+        tree.style.fontSize = (Math.random() * 15 + 10) + 'px'; // Random sizes between 10px and 25px
+        tree.style.opacity = Math.random() * 0.5 + 0.1; // Random opacity
+        tree.innerHTML = christmasTree;
+        document.body.appendChild(tree);
+        
+        // Add subtle movement to trees
+        setInterval(() => {
+            tree.style.transform = `rotate(${Math.sin(Date.now() / 1000) * 5}deg)`;
+        }, 50);
+    }
+}
+
+// Call createSnowflakes when the window loads
+window.addEventListener('load', () => {
+    createSnowflakes();
+    createDigitalEffect();
+    startScreen.style.display = 'none'; // Hide start screen initially
+});
+
+enterButton.addEventListener('click', () => {
+    introScreen.style.animation = 'fadeIn 1s ease-out reverse';
+    setTimeout(() => {
+        introScreen.style.display = 'none';
+        startScreen.style.display = 'block';
+    }, 1000);
+});
+
+draw();
+</script></body></html>
